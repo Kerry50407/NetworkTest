@@ -2,8 +2,10 @@ package com.example.networktest;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -20,11 +22,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
 	private TextView textView1;
+	private EditText editText1;
 	private Button button1;
 
 	@Override
@@ -33,6 +37,8 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		textView1 = (TextView) findViewById(R.id.textView1);
+		editText1 = (EditText) findViewById(R.id.editText1);
+
 		button1 = (Button) findViewById(R.id.button1);
 
 		button1.setOnClickListener(new OnClickListener() {
@@ -40,12 +46,24 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				String content = fetch("http://www.ntu.edu.tw/");
-//				textView1.setText(content);
-				task.execute("http://www.ntu.edu.tw/");
+				// textView1.setText(content);
+				String address;
+				try {
+					address = URLEncoder.encode(editText1.getText()
+							.toString(), "utf-8");
+					String url = "https://maps.googleapis.com/maps/api/geocode/json?address="
+							+ address;
+
+					new NetworkRunner().execute(url);
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 			}
 		});
-		
-//		disableStrictMode();
+
+		// disableStrictMode();
 	}
 
 	private void disableStrictMode() {
@@ -106,19 +124,19 @@ public class MainActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	AsyncTask<String, Integer, String> task = new AsyncTask<String, Integer, String>() {
+
+	class NetworkRunner extends AsyncTask<String, Integer, String> {
 
 		@Override
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
 			return fetch2(params[0]);
 		}
-		
+
 		protected void onPostExecute(String result) {
 			textView1.setText(result);
 		}
-		
+
 	};
 
 }
