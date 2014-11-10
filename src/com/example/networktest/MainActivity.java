@@ -12,6 +12,9 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -129,12 +132,29 @@ public class MainActivity extends Activity {
 
 		@Override
 		protected String doInBackground(String... params) {
-			// TODO Auto-generated method stub
 			return fetch2(params[0]);
 		}
 
 		protected void onPostExecute(String result) {
-			textView1.setText(result);
+
+			try {
+				
+				JSONObject jsonObject = new JSONObject(result);
+				JSONObject result0 = jsonObject.getJSONArray("results").getJSONObject(0);
+				
+				JSONObject location = result0.getJSONObject("geometry").getJSONObject("location");
+				
+				String formattedAddress = result0.getString("formatted_address");
+				double lat = location.getDouble("lat");
+				double lng = location.getDouble("lng");
+				
+				textView1.setText(formattedAddress + " , " + lat + " , " + lng);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
 		}
 
 	};
